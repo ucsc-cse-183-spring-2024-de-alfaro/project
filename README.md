@@ -9,7 +9,7 @@ The project is organized around the following main pages:
 - Stats page.  Enables users to see stats and compilations about their own data. 
 - Location page.  Enables users to ask for details about a birding location. 
 
-There can of course be auxiliary management pages built.  The four pages above should be developed in vue.js. 
+There can of course be auxiliary management pages built.  The four pages above should be developed in vue.js.  You can, for instance, assign one group member to develop each page. 
 
 ## Index page
 
@@ -100,10 +100,42 @@ Users should be able to see their own statistics.  This page should show things 
 
 I will provide and link here some data you can use to prime the database, which can be helpful in testing.  I will also provide here the full list of species you should consider. 
 
+I advise developing the database schema first, discussing it all togehter.  Once that is in place, each person can take the lead in developing one of the pages, and you can use synthetic data to test and develop the pages (using the data I will provide, or augmenting it with your own data).
 
+## Project Submission
 
+### Project repository
 
+You should create a ***private*** repository on GitHub, and add as collaborators: 
+- `lucadealfaro`
+- ... (the TAs, TBC). 
 
+You will be able to make the project public, if you so wish, after the project is graded.
 
+### By Monday May 20
 
+Please provide by Monday May 20 the details on your project, including the members and the GitHub location of the repository, using [this form](https://docs.google.com/forms/d/e/1FAIpQLSfccd772WcTjhwGVkzYDFi_QpAzl0QYN5UPkei1MlYohyZPTQ/viewform?usp=sf_link).
 
+### By Monday June 10
+
+#### Project submission
+
+You should submit the project to [this form](https://docs.google.com/forms/d/e/1FAIpQLSf7gW1ktx-WCcmRa2GdAbRlRdKUFFBeuSm49fwYIUdY_EQOVQ/viewform?usp=sf_link).
+The project should be submitted as a zip file containing the project directory; please verify that the zip enables someone to run the project without any additional information. 
+A `zipit.py` program will be provided here shortly for zipping the project. 
+
+#### Peer evaluation
+
+You should also fill a [peer evaluation](https://docs.google.com/forms/d/e/1FAIpQLScKLnBd6ZR26_3vOtY-E33_PJYmfgExD0-C8RfRxFr5FBuK0g/viewform?usp=sf_link). 
+
+## Project grading
+
+The project will be graded on the following criteria:
+
+- Code quality
+- Security
+- User interface
+- Completeness
+- Creativity
+
+The project will be graded by the instructor and the TAs.  We will look in detail at the commit log of the project, so please make sure to commit often and with meaningful messages, and make sure everybody commits their own code so we can attribute the work correctly.
