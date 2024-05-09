@@ -132,7 +132,8 @@ and similarly for the other tables.
 
 You should create a ***private*** repository on GitHub, and add as collaborators: 
 - `lucadealfaro`
-- ... (the TAs, TBC). 
+- `Fallenhh`
+- `Pratik-Doshi-99`
 
 You will be able to make the project public, if you so wish, after the project is graded.
 
