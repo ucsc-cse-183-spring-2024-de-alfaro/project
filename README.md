@@ -98,9 +98,33 @@ Users should be able to see their own statistics.  This page should show things 
 
 ## Developing your app
 
-I will provide and link here some data you can use to prime the database, which can be helpful in testing.  I will also provide here the full list of species you should consider. 
+### Development advice 
 
 I advise developing the database schema first, discussing it all togehter.  Once that is in place, each person can take the lead in developing one of the pages, and you can use synthetic data to test and develop the pages (using the data I will provide, or augmenting it with your own data).
+
+### Sample data
+
+You should prime the database with [this data](https://drive.google.com/drive/folders/1NV5vMn0h3O5peppvBHqcdJAudPQe_Qkg?usp=sharing). 
+The data is in the form of three csv files, which can be loaded into the database, for example by reading them via the `csv` Python module and inserting them into the database: 
+
+- `species.csv` contains the species of birds (about 400). 
+- `checklists.csv` contains the checklists.  Each checklist has a user, a location, and a data, among other fields. 
+- `sightings.csv` contains the sightings.  Each sighting has a checklist, a species, and a number of birds seen.
+
+The checklists and sightings are linked by the `SAMPLING EVENT IDENTIFIER` field. 
+Note that while the original data comes from 10 days of eBird checklists in the area, it has been modified, so the data does not correspond to real observations (you may find strange observations, such as sparrows in the ocean!). 
+
+To prime the database, you can use code in `models.py` like this:
+
+```
+if db(db.species).isempty():
+    with open('species.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            db.species.insert(name=row[0])
+```
+
+and similarly for the other tables.
 
 ## Project Submission
 
