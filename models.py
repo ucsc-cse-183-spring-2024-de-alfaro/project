@@ -11,6 +11,9 @@ import csv # To read csv files
 def get_user_email():
     return auth.current_user.get('email') if auth.current_user else None
 
+def get_user_id():
+    return auth.current_user.get('id') if auth.current_user else None
+
 def get_time():
     return datetime.datetime.utcnow()
 
@@ -41,7 +44,7 @@ def prime_checklist():
                     longitude=parsed_line[2],
                     date=parsed_line[3],
                     time=parsed_line[4],
-                    user_id=parsed_line[5],
+                    observer_id=parsed_line[5],
                     duation=parsed_line[6]
                 )
 
@@ -76,8 +79,9 @@ db.define_table('checklists',
     Field('longitude'),     # LONGITUDE - longitude of sighting
     Field('date'),          # DATE - observation date
     Field('time'),          # TIME - time observations started
-    Field('user_id'),       # USER_ID - observer ID, user needs to be logged in to enter a checklist
+    Field('observer_id'),   # OBSERVER_ID - observer ID, from checklist.csv
     Field('duration'),      # DURATION - duration of minutes of observations
+    Field('user_id')        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
 )
 
 ### SIGHTINGS DATABASE ###
