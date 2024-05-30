@@ -164,3 +164,12 @@ The project will be graded on the following criteria:
 - Creativity
 
 The project will be graded by the instructor and the TAs.  We will look in detail at the commit log of the project, so please make sure to commit often and with meaningful messages, and make sure everybody commits their own code so we can attribute the work correctly.
+
+## How to Run App
+
+To run the app just type: ```py4web run --errorlog=:stdout -L 20 apps```
+
+But before make sure to run ``` ps aux | grep 'py4web' ``` to check for any processes that are running 
+and use ``` kill -9 [PID] ``` to kill it 
+
+then you can open the app on the browser by typing ``` http://localhost:8000/ebird ```
