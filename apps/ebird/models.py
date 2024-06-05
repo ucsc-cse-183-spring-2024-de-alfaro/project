@@ -25,27 +25,28 @@ def get_time():
 # species.csv contains the species of birds (about 400)
 def prime_species():
     if db(db.species).isempty():
-        with open('/csvfiles/species.csv', 'r') as f:
+        with open('./csvfiles/species.csv', 'r') as f:
             reader = csv.reader(f)
+            next(reader)  # Skip the header row
             for row in reader:
                 db.species.insert(specie=row[0])
 
 # Function to prime the checklists database
 # checklists.csv contains the checklists
-def prime_checklist():
+def prime_checklists():
     if db(db.checklists).isempty():
-        with open('/csvfiles/checklists.csv', 'r') as f:
+        with open('./csvfiles/checklists.csv', 'r') as f:
             reader = csv.reader(f)
+            next(reader)  # Skip the header row
             for row in reader:
-                parsed_line = row[0].split(',')
                 db.checklists.insert(
-                    sei=parsed_line[0],
-                    latitude=parsed_line[1],
-                    longitude=parsed_line[2],
-                    date=parsed_line[3],
-                    time=parsed_line[4],
-                    observer_id=parsed_line[5],
-                    duation=parsed_line[6]
+                    sei=row[0],
+                    latitude=row[1],
+                    longitude=row[2],
+                    date=row[3],
+                    time=row[4],
+                    observer_id=row[5],
+                    duation=row[6]
                 )
 
 # Function to prime the sightings database
@@ -53,16 +54,16 @@ def prime_checklist():
 # Each sighting has a checklist, a species, and a number of birds seen.
 def prime_sightings():
     if db(db.sightings).isempty():
-        with open('/csvfiles/sightings.csv', 'r') as f:
+        with open('./csvfiles/sightings.csv', 'r') as f:
             reader = csv.reader(f)
+            next(reader)  # Skip the header row
             for row in reader:
-                parsed_line = row[0].split(',')
                 db.sightings.insert(
-                    sei=parsed_line[0],
-                    specie=parsed_line[1],
-                    count=parsed_line[2],
+                    sei=row[0],
+                    specie=row[1],
+                    count=row[2],
+                    favorite=False  # Default value
                 )
-
 # -------------------------- DATABASES -------------------------- #
 
 ### SPECIES DATABASE ###
@@ -70,6 +71,7 @@ def prime_sightings():
 db.define_table('species',
     Field('specie')        # SPECIE - common name of the specie
 )
+prime_species()
 
 ### CHECKLIST DATABASE ###
 # SAMPLING EVENT IDENTIFIER,LATITUDE,LONGITUDE,OBSERVATION DATE,TIME OBSERVATIONS STARTED,OBSERVER ID,DURATION MINUTES
@@ -83,6 +85,7 @@ db.define_table('checklists',
     Field('duration'),      # DURATION - duration of minutes of observations
     Field('user_id')        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
 )
+prime_checklists()
 
 ### SIGHTINGS DATABASE ###
 # SAMPLING EVENT IDENTIFIER,COMMON NAME,OBSERVATION COUNT
@@ -90,9 +93,9 @@ db.define_table('sightings',
     Field('sei'),           # SAMPLING EVENT IDENTIFIER - connects checklist & sightings
     Field('specie'),        # SPECIE - common name of the specie
     Field('count'),         # COUNT - observation count
-    Field('favorite'),      # FAVORITE - our creative addition, whether it's a favorite of the user :)
+    Field('favorite', 'boolean', default=False),      # FAVORITE - our creative addition, whether it's a favorite of the user :)
 )
+prime_sightings()
 
 ## always commit your models to avoid problems later
-
 db.commit()
