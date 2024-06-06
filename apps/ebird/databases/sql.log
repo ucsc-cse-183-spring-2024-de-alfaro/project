@@ -56,3 +56,4 @@ CREATE TABLE "sightings"(
     "favorite" CHAR(512)
 );
 success!
+success!
