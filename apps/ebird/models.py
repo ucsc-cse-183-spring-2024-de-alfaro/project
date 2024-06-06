@@ -7,6 +7,30 @@ from .common import db, Field, auth
 from pydal.validators import *
 import csv # To read csv files
 
+import pandas as pd
+
+import pandas as pd
+
+def get_heatmap_data(species_name='all'):
+    # Load CSV files
+    checklists_df = pd.read_csv('./csvfiles/checklists.csv')
+    sightings_df = pd.read_csv('./csvfiles/sightings.csv')
+    # print(checklists_df)
+    
+    # Join sightings with checklists on SAMPLING EVENT IDENTIFIER
+    sightings_with_location_df = pd.merge(sightings_df, checklists_df, on='SAMPLING EVENT IDENTIFIER')
+
+    if species_name != 'all':
+        sightings_with_location_df = sightings_with_location_df[sightings_with_location_df['COMMON NAME'] == species_name]
+    
+    # Remove non-numeric values in OBSERVATION COUNT
+    sightings_with_location_df = sightings_with_location_df[pd.to_numeric(sightings_with_location_df['OBSERVATION COUNT'], errors='coerce').notnull()]
+    
+    # Prepare data for heatmap: [latitude, longitude, intensity]
+    heatmap_data = sightings_with_location_df[['LATITUDE', 'LONGITUDE', 'OBSERVATION COUNT']].copy()
+    heatmap_data['OBSERVATION COUNT'] = heatmap_data['OBSERVATION COUNT'].astype(float)
+    
+    return heatmap_data.values.tolist()
 
 def get_user_email():
     return auth.current_user.get('email') if auth.current_user else None

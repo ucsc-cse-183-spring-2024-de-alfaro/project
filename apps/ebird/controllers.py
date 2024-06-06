@@ -29,16 +29,17 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email
+from .models import get_user_email, get_heatmap_data
 
 url_signer = URLSigner(session)
+
 
 @action('index')
 @action.uses('index.html', db, auth, url_signer)
 def index():
     return dict(
-        # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
     )
 
 @action('my_callback')
@@ -46,3 +47,18 @@ def index():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
+
+@action('get_heatmap_data')
+@action.uses(db, auth)
+def get_heatmap_data_action():
+    try:
+        species = request.params.get('species', 'all')
+        if species is None:
+            species = 'all'
+        logger.info(f"Received species: {species}")  # Log for debugging
+        heatmap_data = get_heatmap_data(species)
+        return dict(heatmap_data=heatmap_data)
+    except Exception as e:
+        logger.error(f"Error in get_heatmap_data_action: {str(e)}")  # Log for debugging
+        response.status = 500
+        return dict(error=str(e))
