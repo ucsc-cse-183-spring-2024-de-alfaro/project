@@ -33,13 +33,13 @@ from .models import get_user_email, get_heatmap_data
 
 url_signer = URLSigner(session)
 
-
 @action('index')
 @action.uses('index.html', db, auth, url_signer)
 def index():
     return dict(
         my_callback_url = URL('my_callback', signer=url_signer),
         get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
+        checklist_url = URL('checklist', signer=url_signer),
     )
 
 @action('my_callback')
@@ -62,3 +62,18 @@ def get_heatmap_data_action():
         logger.error(f"Error in get_heatmap_data_action: {str(e)}")  # Log for debugging
         response.status = 500
         return dict(error=str(e))
+    
+@action('checklist', method=['POST', 'GET'])
+@action.uses('checklist.html', session, db, auth.user, url_signer)
+def checklist(): 
+    return dict(
+            checklist_url = URL('checklist', signer=url_signer),
+            load_checklists_url = URL('load_checklists')
+            )
+
+@action('load_checklists')
+@action.uses(db, session, auth.user)
+def load_checklists(): 
+    data = db(db.sightings).select().as_list()
+    return dict(data=data)
+

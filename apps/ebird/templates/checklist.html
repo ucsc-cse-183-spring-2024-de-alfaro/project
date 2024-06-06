@@ -1,0 +1,48 @@
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
+
+<div class="container" id="app" v-cloak>
+  <div class="hero is-info"> 
+    <div class="hero-body">
+      <div class="container is-info">
+        <h1 class="title">Checklist</h1>
+        <h3 class="subtitle">subtitle</h3>
+      </div>
+    </div>
+  </div>
+  <div class="section"> 
+    <table class="table is-fullwidth is-striped is-bordered is-hoverable is-fullwidth"> 
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Specie</th>
+          <th>Count</th>
+        </tr>
+        </thead>
+        <tbody> 
+          <tr v-for="bird in checklists" :key="bird.id">
+            <td>{{ bird.id }}</td>
+            <td>{{ bird.specie }}</td>
+            <td>{{ bird.count }}</td>
+          </tr>
+        </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+    let checklist_url = "[[=XML(checklist_url)]]";
+    let load_checklists_url = "[[=XML(load_checklists_url)]]";
+</script>
+<script src="js/checklist.js"></script>
+[[end]]
+
+
