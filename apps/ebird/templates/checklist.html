@@ -4,6 +4,7 @@
 [v-cloak] {
      display: none;
 }
+
 </style>
 
 <div class="container" id="app" v-cloak>
@@ -15,20 +16,33 @@
       </div>
     </div>
   </div>
+  <div> 
+    <input class="input" type="text" placeholder="Search Species">
+    <!-- add search icon ^ -->
+  </div>
   <div class="section"> 
-    <table class="table is-fullwidth is-striped is-bordered is-hoverable is-fullwidth"> 
+    <table class="table is-fullwidth is-striped is-hoverable is-fullwidth"> 
       <thead>
         <tr>
-          <th>ID</th>
           <th>Specie</th>
           <th>Count</th>
+          <th>Enter your Observations</th>
         </tr>
         </thead>
         <tbody> 
-          <tr v-for="bird in checklists" :key="bird.id">
-            <td>{{ bird.id }}</td>
-            <td>{{ bird.specie }}</td>
-            <td>{{ bird.count }}</td>
+          <tr v-for="checklist in checklists" :key="checklist.sightings.id">
+            <td>{{ checklist.sightings.specie }}</td>
+            <td>{{ checklist.total_count }}</td>
+            <td>
+              <div class="columns">
+                <div class="column">
+                    <input class="input" type="number" value="0" min="0">
+                </div>
+                <div class="column">
+                    <button class="button is-small is-primary" type="button">Submit</button>
+                </div>
+              </div>
+            </td>
           </tr>
         </tbody>
     </table>

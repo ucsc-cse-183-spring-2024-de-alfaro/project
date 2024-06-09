@@ -74,6 +74,7 @@ def checklist():
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 
-    data = db(db.sightings).select().as_list()
+    data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
+                               groupby=db.sightings.specie).as_list()
     return dict(data=data)
 
