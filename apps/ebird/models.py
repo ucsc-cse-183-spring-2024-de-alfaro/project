@@ -129,6 +129,7 @@ prime_sightings()
 db.define_table('checklist_data',
     Field('specie'),
     Field('total_count', 'integer'),
+    Field('input', 'integer', default=0)
 )
 
 ## always commit your models to avoid problems later

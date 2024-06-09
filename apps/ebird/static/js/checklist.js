@@ -8,7 +8,7 @@ app.data = {
             checklists: [],
             search_query: "",
             search_results: [],
-            count: 0
+            input: 0,
         };
     },
     computed: {
@@ -17,6 +17,9 @@ app.data = {
         }    
     },
     methods: {
+        find_specie_index: function(id) {
+            return this.checklists.findIndex(specie => specie.id === id);
+        },
         search: function () {
             let self = this; 
             if (self.search_query.length > 0) {
@@ -29,15 +32,32 @@ app.data = {
                 self.search_results = [];
             }
         },
-        logId: function(id) {
-            console.log("ID:",id);
-        },
-        inc_count: function(count) {
-            console.log("count:", this.count);
+        inc_count: function(count, id) {
+            let self = this;
+            if (count > 0) {
+                axios.post(inc_count_url, {
+                    count: count,
+                    id: id
+                }).then(function (r) {
+                    console.log("total:", r.data.total)
+                    let index = self.find_specie_index(id);
+                    if (index !== -1) {
+                        self.checklists[index].total_count = r.data.total;
+                    }
+                    console.log("local total: ", self.checklists[index].total_count)
+                });
+            }
         }
     }
 };
 
+// add_count: function(s_id) {
+//     let self = this;
+//     let i = self.find_sighting_idx(s_id);
+//     axios.post(inc_sightings_url, { id: s_id }).then(function (r) {
+//         self.sightings[i].bird_count = r.data.bird_count;
+//     })
+// },
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {

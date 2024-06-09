@@ -63,6 +63,8 @@ def get_heatmap_data_action():
         response.status = 500
         return dict(error=str(e))
     
+
+# -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
 @action('checklist', method=['POST', 'GET'])
 @action.uses('checklist.html', session, db, auth.user, url_signer)
 def checklist(): 
@@ -70,32 +72,29 @@ def checklist():
             checklist_url = URL('checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             search_species_url = URL('search'),
+            inc_count_url = URL('inc_count')
             )
-
-# @action('load_checklists')
-# @action.uses(db, session, auth.user)
-# def load_checklists(): 
-#     data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
-#                                groupby=db.sightings.specie).as_list()
-#     return dict(data=data) 
-
 
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 
-
     data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
                                 groupby=db.sightings.specie).as_list()
     for row in data:
         db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
                                            specie=row['sightings']['specie'], total_count=row['total_count'])
-    d = db(db.checklist_data).select().as_list()
-    return dict(data=d)
+    checklist_table_data = db(db.checklist_data).select().as_list()
+    return dict(data=checklist_table_data)
 
-# @action('add_checklist')
-# @action.uses(db,session, auth.user)
-# def add_checklist(): 
-
+@action('inc_count', method='POST') 
+@action.uses(db, session, auth.user)
+def inc_count(): 
+    count = request.json.get('count')
+    id = request.json.get('id')
+    specie = db(db.checklist_data.id == id).select().first()
+    specie.total_count += count; 
+    specie.update_record()
+    return dict(total=specie.total_count)
 
 @action('search')
 @action.uses(db, session, auth.user)
@@ -105,4 +104,5 @@ def search():
                                 db.checklist_data.total_count, 
                                 groupby=db.checklist_data.specie).as_list()
     return dict(results=results)
+# ----------------------------------------------------------------------------- #
 

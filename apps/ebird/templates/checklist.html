@@ -23,12 +23,12 @@
   </div>
   <!-- TABLE -->
   <div class="section"> 
-    <table class="table is-fullwidth is-striped is-hoverable is-fullwidth"> 
+    <table class="table is-fullwidth is-striped is-hoverable"> 
       <thead>
         <tr>
           <th>Specie</th>
           <th>Count</th>
-          <th>Enter your Observations</th>
+          <th>Enter the number of birds you have seen!</th>
         </tr>
         </thead>
         <tbody> 
@@ -38,10 +38,10 @@
             <td>
               <div class="columns">
                 <div class="column">
-                    <input class="input" type="number" value="0" min="0">
+                    <input class="input" type="number" min="0" v-model="checklist.input" placeholder="Enter bird count" >
                 </div>
                 <div class="column">
-                    <button class="button is-small is-primary" type="button">Submit</button>
+                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id)">Submit</button>
                 </div>
               </div>
             </td>
@@ -58,6 +58,7 @@
     let checklist_url = "[[=XML(checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
     let search_species_url = "[[=XML(search_species_url)]]";
+    let inc_count_url = "[[=XML(inc_count_url)]]";
 </script>
 <script src="js/checklist.js"></script>
 [[end]]
