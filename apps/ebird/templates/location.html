@@ -14,12 +14,15 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Use v-for to create a row for each species -->
                 <tr v-for="species in speciesList" :key="species.specie">
                     <td>{{ species.specie }}</td>
                     <td>{{ species.sightings }}</td>
                 </tr>
             </tbody>
         </table>
+        <!-- Display a message when the list is empty -->
+        <p v-if="speciesList.length === 0">Loading species data...</p>
     </div>
 </div>
 
@@ -56,8 +59,9 @@
         mounted() {
             axios.post('/ebird/api/get_species_list') // Change the API endpoint to fetch species list data
                 .then(response => {
-                    console.log(response.data);
-                    this.speciesList = response.data; // Assuming the response contains an array of species objects
+                    //console.log(response.data);
+                    this.speciesList = response.data.speciesList; // Assuming the response contains an array of species objects
+                    //console.log("Species list populated:", this.speciesList); // Verify the data
                 })
                 .catch(error => {
                     console.error("Error fetching species list data:", error);

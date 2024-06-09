@@ -106,7 +106,7 @@ def get_sightings():
 def get_species_list():
     try:
         # Fetch distinct species from the sightings table
-        species_list = db(db.sightings).select(db.sightings.specie).as_list()
+        species_list = db(db.sightings).select(db.sightings.specie, distinct=True).as_list()
         
         # Count the number of sightings for each species
         for species in species_list:
