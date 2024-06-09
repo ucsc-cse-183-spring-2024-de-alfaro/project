@@ -1,0 +1,143 @@
+[[extend "layout.html"]]
+
+
+<div class="section" id="list_species" v-cloak>
+    <h1 class="title">Location</h1>
+    <!-- Species List -->
+    <div class="box" id="list_species_container">
+        <h2 class="subtitle">A list of species seen in the region</h2>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Species</th>
+                    <th>Sightings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="species in speciesList" :key="species.specie">
+                    <td>{{ species.specie }}</td>
+                    <td>{{ species.sightings }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section" id="over_time" v-cloak>
+    <h1 class="title">Species Seen Over Time</h1>
+    <canvas id="over_time_chart"></canvas>
+</div>
+
+<div class="section" id="top_contributors" v-cloak>
+    <h1 class="title">Top Contributors</h1>
+</div>
+
+[[block page_scripts]]
+<!-- Include Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Include Luxon for date handling -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+
+<!-- Include axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#list_species_container', // Change the id here to match the id of the species list section
+        data: {
+            speciesList: [] // Initialize an empty array to hold species data
+        },
+        mounted() {
+            axios.post('/ebird/api/get_species_list') // Change the API endpoint to fetch species list data
+                .then(response => {
+                    console.log(response.data);
+                    this.speciesList = response.data; // Assuming the response contains an array of species objects
+                })
+                .catch(error => {
+                    console.error("Error fetching species list data:", error);
+                });
+        }
+    });
+
+    new Vue({
+        el: '#over_time',
+        data: {
+            sightings: []
+        },
+        mounted() {
+            console.log("Luxon is loaded:", luxon !== undefined);
+            axios.post('/ebird/api/get_sightings', { species: 'American Robin' })  // Change species name here
+                .then(response => {
+                    //console.log("Sightings data:", response.data.sightings);
+                    this.sightings = response.data.sightings;
+                    this.renderChart();
+                })
+                .catch(error => {
+                    console.error("There was an error!!!", error);
+                });
+        },
+        methods: {
+            renderChart() {
+                const ctx = document.getElementById('over_time_chart').getContext('2d');
+
+                const data = this.sightings
+                    .filter(d => d.date && !isNaN(d.count))
+                    .map(d => {
+                        try {
+                            return {
+                                x: new Date(luxon.DateTime.fromISO(d.date).toISO()),
+                                y: +d.count
+                            };
+                        } catch (error) {
+                            console.error("Error parsing date:", error);
+                            return null;
+                        }
+                    })
+                    .filter(d => d !== null);
+
+                //console.log(data);    
+                //console.log("X values:", data.map(point => point.x));
+
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Species Seen Over Time',
+                            data: data,
+                            borderColor: 'steelblue',
+                            borderWidth: 1,
+                            xAxisID: 'xAxis', // Specify the x-axis scale ID
+                            yAxisID: 'yAxis' // Specify the y-axis scale ID
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            xAxis: { // Define the x-axis scale
+                                type: 'time',
+                                adapters: {
+                                    date: {
+                                        zone: 'utc', // optional, for setting the time zone
+                                        locale: 'en-US', // optional, for setting the locale
+                                        outputCalendar: 'gregory', // optional, for setting the output calendar
+                                    }
+                                }
+                            },
+                            yAxis: { // Define the y-axis scale
+                                beginAtZero: true // Start the y-axis from zero
+                            }
+                        }
+                    }
+                });
+
+            }
+        }
+    });
+</script>
+
+[[end]]
