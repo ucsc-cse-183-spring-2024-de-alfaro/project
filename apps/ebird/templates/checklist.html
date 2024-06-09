@@ -38,10 +38,10 @@
             <td>
               <div class="columns">
                 <div class="column">
-                    <input class="input" type="number" min="0" v-model="checklist.input" placeholder="Enter bird count" >
+                    <input class="input is-size-7" type="number" min="0" v-model="checklist.input" placeholder="Enter Bird Count" >
                 </div>
                 <div class="column">
-                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id)">Submit</button>
+                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id, checklist.specie)">Submit</button>
                 </div>
               </div>
             </td>

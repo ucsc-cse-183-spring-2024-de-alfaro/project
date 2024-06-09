@@ -8,7 +8,6 @@ app.data = {
             checklists: [],
             search_query: "",
             search_results: [],
-            input: 0,
         };
     },
     computed: {
@@ -32,12 +31,13 @@ app.data = {
                 self.search_results = [];
             }
         },
-        inc_count: function(count, id) {
+        inc_count: function(count, id, specie) {
             let self = this;
             if (count > 0) {
                 axios.post(inc_count_url, {
                     count: count,
-                    id: id
+                    id: id,
+                    specie: specie
                 }).then(function (r) {
                     console.log("total:", r.data.total)
                     let index = self.find_specie_index(id);
@@ -51,13 +51,6 @@ app.data = {
     }
 };
 
-// add_count: function(s_id) {
-//     let self = this;
-//     let i = self.find_sighting_idx(s_id);
-//     axios.post(inc_sightings_url, { id: s_id }).then(function (r) {
-//         self.sightings[i].bird_count = r.data.bird_count;
-//     })
-// },
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
