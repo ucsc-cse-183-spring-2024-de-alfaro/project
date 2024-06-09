@@ -32,7 +32,7 @@
         </tr>
         </thead>
         <tbody> 
-          <tr v-for="checklist in checklists" :key="checklist.sightings.id">
+          <tr v-for="checklist in table_data" :key="checklist.sightings.id">
             <td>{{ checklist.sightings.specie }}</td>
             <td>{{ checklist.total_count }}</td>
             <td>

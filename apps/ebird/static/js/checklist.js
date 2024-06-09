@@ -11,6 +11,11 @@ app.data = {
             search_results: [],
         };
     },
+    computed: {
+        table_data: function () {
+            return this.search_results.length > 0 ? this.search_results : this.checklists;
+        }    
+    },
     methods: {
         search: function () {
             let self = this; 
@@ -21,7 +26,7 @@ app.data = {
                         console.log("Search results;", r.data.results)
                 });
             } else {
-                self.results = [];
+                self.search_results = [];
             }
         }
     }
