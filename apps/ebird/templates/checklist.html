@@ -16,10 +16,12 @@
       </div>
     </div>
   </div>
+  <!-- SEARCH BAR -->
   <div> 
-    <input class="input" type="text" placeholder="Search Species">
+    <input class="input" type="text" placeholder="Search Species" v-model="search_query" @keyup="search">
     <!-- add search icon ^ -->
   </div>
+  <!-- TABLE -->
   <div class="section"> 
     <table class="table is-fullwidth is-striped is-hoverable is-fullwidth"> 
       <thead>
@@ -55,6 +57,7 @@
 <script>
     let checklist_url = "[[=XML(checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
+    let search_species_url = "[[=XML(search_species_url)]]";
 </script>
 <script src="js/checklist.js"></script>
 [[end]]

@@ -68,7 +68,8 @@ def get_heatmap_data_action():
 def checklist(): 
     return dict(
             checklist_url = URL('checklist', signer=url_signer),
-            load_checklists_url = URL('load_checklists')
+            load_checklists_url = URL('load_checklists'),
+            search_species_url = URL('search'),
             )
 
 @action('load_checklists')
@@ -78,3 +79,11 @@ def load_checklists():
                                groupby=db.sightings.specie).as_list()
     return dict(data=data)
 
+@action('search')
+@action.uses(db, session, auth.user)
+def search(): 
+    q = request.params.get('q')
+    results = db(db.sightings.specie.like(f"%{q}%")).select(db.sightings.specie,
+                                db.sightings.count.sum().with_alias('total_count'), 
+                                groupby=db.sightings.specie).as_list()
+    return dict(results=results)
