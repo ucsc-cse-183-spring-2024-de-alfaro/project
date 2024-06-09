@@ -89,8 +89,18 @@ def load_checklists():
 @action('inc_count', method='POST') 
 @action.uses(db, session, auth.user)
 def inc_count(): 
+    # Get the count and id from the request
     count = request.json.get('count')
     id = request.json.get('id')
+    specie=request.json.get('specie')
+    
+    # Add observation to sightings table
+    # Figure out how to do SEI for new sightings
+    db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
+    # sighting_id = db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
+    # print("sightings entry: ", db(db.sightings.id == sighting_id).select().first())      
+              
+    # Update data for checklist table displayed on server side
     specie = db(db.checklist_data.id == id).select().first()
     specie.total_count += count; 
     specie.update_record()
