@@ -33,6 +33,24 @@
 
 <div class="section" id="top_contributors" v-cloak>
     <h1 class="title">Top Contributors</h1>
+    <div class="box" id="top_contributors_container">
+        <h2 class="subtitle">Contributors with the most sightings</h2>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Contributor</th>
+                    <th>Number of Sightings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="contributor in topContributors" :key="contributor.observer_id">
+                    <td>{{ contributor.observer_id }}</td>
+                    <td>{{ contributor.sighting_count }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-if="topContributors.length === 0">Loading top contributors...</p>
+    </div>
 </div>
 
 [[block page_scripts]]
@@ -51,6 +69,22 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+    new Vue({
+        el: '#top_contributors_container',
+        data: {
+            topContributors: [] // Ensure topContributors is initialized as an empty array
+        },
+        mounted() {
+            axios.post('/ebird/api/get_top_contributors')
+                .then(response => {
+                    this.topContributors = response.data.topContributors;
+                })
+                .catch(error => {
+                    console.error("Error fetching top contributors:", error);
+                });
+        }
+    });
+
     new Vue({
         el: '#list_species_container', // Change the id here to match the id of the species list section
         data: {

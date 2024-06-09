@@ -29,18 +29,17 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email
-
-import json
+from .models import get_user_email, get_heatmap_data
 
 url_signer = URLSigner(session)
+
 
 @action('index')
 @action.uses('index.html', db, auth, url_signer)
 def index():
     return dict(
-        # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
     )
 
 @action('my_callback')
@@ -112,10 +111,30 @@ def get_species_list():
         for species in species_list:
             species['sightings'] = db(db.sightings.specie == species['specie']).count()
             
-        print(species_list)
+        #print(species_list)
         return dict(speciesList=species_list)
     except Exception as e:
         logger.error(f"Error fetching species list: {str(e)}")
+        return dict(error=str(e))
+    
+
+@action('api/get_top_contributors', method=['GET', 'POST'])
+@action.uses(db)
+def get_top_contributors():
+    try:
+        # Query to count the number of checklists per observer
+        query = """
+            SELECT observer_id, COUNT(*) as sighting_count
+            FROM checklists
+            GROUP BY observer_id
+            ORDER BY sighting_count DESC
+            LIMIT 10;  -- Limit to top 10 contributors
+        """
+        top_contributors = db.executesql(query, as_dict=True)
+
+        return dict(topContributors=top_contributors)
+    except Exception as e:
+        logger.error(f"Error fetching top contributors: {str(e)}")
         return dict(error=str(e))
 
 
