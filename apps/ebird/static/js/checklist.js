@@ -6,9 +6,9 @@ app.data = {
     data: function() {
         return {
             checklists: [],
-            my_value: 0,
             search_query: "",
             search_results: [],
+            count: 0
         };
     },
     computed: {
@@ -28,6 +28,12 @@ app.data = {
             } else {
                 self.search_results = [];
             }
+        },
+        logId: function(id) {
+            console.log("ID:",id);
+        },
+        inc_count: function(count) {
+            console.log("count:", this.count);
         }
     }
 };

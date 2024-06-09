@@ -32,8 +32,8 @@
         </tr>
         </thead>
         <tbody> 
-          <tr v-for="checklist in table_data" :key="checklist.sightings.id">
-            <td>{{ checklist.sightings.specie }}</td>
+          <tr v-for="checklist in table_data" :key="checklist.id">
+            <td>{{ checklist.specie }}</td>
             <td>{{ checklist.total_count }}</td>
             <td>
               <div class="columns">

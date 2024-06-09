@@ -72,18 +72,37 @@ def checklist():
             search_species_url = URL('search'),
             )
 
+# @action('load_checklists')
+# @action.uses(db, session, auth.user)
+# def load_checklists(): 
+#     data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
+#                                groupby=db.sightings.specie).as_list()
+#     return dict(data=data) 
+
+
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 
+
     data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
-                               groupby=db.sightings.specie).as_list()
-    return dict(data=data)
+                                groupby=db.sightings.specie).as_list()
+    for row in data:
+        db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
+                                           specie=row['sightings']['specie'], total_count=row['total_count'])
+    d = db(db.checklist_data).select().as_list()
+    return dict(data=d)
+
+# @action('add_checklist')
+# @action.uses(db,session, auth.user)
+# def add_checklist(): 
+
 
 @action('search')
 @action.uses(db, session, auth.user)
 def search(): 
     q = request.params.get('q')
-    results = db(db.sightings.specie.like(f"%{q}%")).select(db.sightings.specie,
-                                db.sightings.count.sum().with_alias('total_count'), 
-                                groupby=db.sightings.specie).as_list()
+    results = db(db.checklist_data.specie.like(f"%{q}%")).select(db.checklist_data.specie,
+                                db.checklist_data.total_count, 
+                                groupby=db.checklist_data.specie).as_list()
     return dict(results=results)
+
