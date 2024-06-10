@@ -9,8 +9,6 @@ import csv # To read csv files
 
 import pandas as pd
 
-import pandas as pd
-
 def get_heatmap_data(species_name='all'):
     # Load CSV files
     checklists_df = pd.read_csv('./csvfiles/checklists.csv')

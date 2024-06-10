@@ -65,3 +65,13 @@ ALTER TABLE "sightings" ADD "user_email" CHAR(512);
 success!
 success!
 success!
+success!
+success!
+timestamp: 2024-06-09T21:23:18.568077
+CREATE TABLE "checklist_data"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "specie" CHAR(512),
+    "total_count" INTEGER,
+    "input" INTEGER
+);
+success!
