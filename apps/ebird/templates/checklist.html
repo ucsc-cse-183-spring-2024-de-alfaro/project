@@ -7,21 +7,45 @@
 
 </style>
 
-<div class="container" id="app" v-cloak>
-  <div class="hero is-info"> 
+<div class="section" id="app" v-cloak>
+  <!-- PAGE HEADER -->
+  <div class="hero margin-bottom is-info is-small"> 
     <div class="hero-body">
       <div class="container is-info">
-        <h1 class="title">Checklist</h1>
-        <h3 class="subtitle">subtitle</h3>
+        <h1 class="title">Bird Checklist</h1>
+        <h3 class="subtitle">Explore the vast world of bird species! Discover, learn, and track your feathery friends in our comprehensive library</h3>
       </div>
     </div>
   </div>
-  <!-- SEARCH BAR -->
-  <div> 
-    <input class="input" type="text" placeholder="Search Species" v-model="search_query" @keyup="search">
-    <!-- add search icon ^ -->
+  <!-- SEARCH BAR AND MY-CHECKLIST PAGE REDIRECT BUTTON -->
+  <!-- <div class="m-3"> 
+    <div class="field has-addons">
+      <p class="control has-icons-left">
+        <input class="input is-rounded is-focused is-info custom-width is-medium" type="text" placeholder="Search Species" v-model="search_query" @keyup="search">
+        <span class="icon is-medium is-left">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </span>
+      </p>
+    </div>
+  </div> -->
+  <div class="m-3"> 
+    <div class="level">
+      <div class="level-left">
+        <div class="field has-addons">
+          <p class="control has-icons-left">
+            <input class="input is-rounded is-focused is-info custom-width is-medium" type="text" placeholder="Search Species" v-model="search_query" @keyup="search">
+            <span class="icon is-medium is-left">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="level-right">
+        <a href="[[=URL('index')]]" class="button is-medium is-info">My Checklist</a>
+      </div>
+    </div>
   </div>
-  <!-- TABLE -->
+  <!-- TABLE OF SPECIES -->
   <div class="section"> 
     <table class="table is-fullwidth is-striped is-hoverable"> 
       <thead>
