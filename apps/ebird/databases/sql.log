@@ -57,3 +57,11 @@ CREATE TABLE "sightings"(
 );
 success!
 success!
+timestamp: 2024-06-09T20:49:25.880369
+ALTER TABLE "checklists" ADD "user_email" CHAR(512);
+success!
+timestamp: 2024-06-09T20:49:25.889841
+ALTER TABLE "sightings" ADD "user_email" CHAR(512);
+success!
+success!
+success!

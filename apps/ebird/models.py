@@ -107,7 +107,7 @@ db.define_table('checklists',
     Field('time'),          # TIME - time observations started
     Field('observer_id'),   # OBSERVER_ID - obseçrver ID, from checklist.csv
     Field('duration'),      # DURATION - duration of minutes of observations
-    Field('user_id')        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
+    Field('user_email')        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
 )
 prime_checklists()
 
@@ -117,6 +117,7 @@ db.define_table('sightings',
     Field('sei'),           # SAMPLING EVENT IDENTIFIER - connects checklist & sightings
     Field('specie'),        # SPECIE - common name of the specie
     Field('count'),         # COUNT - observation count
+    Field('user_email'),        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
     Field('favorite', 'boolean', default=False),      # FAVORITE - our creative addition, whether it's a favorite of the user :)
 )
 prime_sightings()
