@@ -14,7 +14,7 @@
   <h1 class="title">Bird Watching Dashboard</h1>
   
   <div>
-    <a href="checklist.html">Submit a Checklist</a>
+    <a href="[[=URL('checklist')]]">Submit a Checklist</a>
   </div>
   <div>
     <a href="[[=URL('stats')]]">My Birding</a>
@@ -37,6 +37,7 @@
 <script>
   let my_callback_url = "[[=XML(my_callback_url)]]";
   let get_heatmap_data_url = "[[=XML(get_heatmap_data_url)]]";  // Use the signed URL in the frontend
+  let checklist_url ="[[=XML(checklist_url)]]";
 
   console.log("my_callback_url:", my_callback_url);  // Log for debugging
   console.log("get_heatmap_data_url:", get_heatmap_data_url);  // Log for debugging

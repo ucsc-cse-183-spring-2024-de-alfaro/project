@@ -41,7 +41,8 @@ def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
-        get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),
+        get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
+        checklist_url = URL('checklist', signer=url_signer),
     )
 
 @action('my_callback')
@@ -71,6 +72,61 @@ def get_heatmap_data_action():
         logger.error(f"Error in get_heatmap_data_action: {str(e)}")  # Log for debugging
         response.status = 500
         return dict(error=str(e))
+    
+
+# -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
+@action('checklist', method=['POST', 'GET'])
+@action.uses('checklist.html', session, db, auth.user, url_signer)
+def checklist(): 
+    return dict(
+            checklist_url = URL('checklist', signer=url_signer),
+            load_checklists_url = URL('load_checklists'),
+            search_species_url = URL('search'),
+            inc_count_url = URL('inc_count')
+            )
+
+@action('load_checklists')
+@action.uses(db, session, auth.user)
+def load_checklists(): 
+    data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
+                                groupby=db.sightings.specie).as_list()
+    for row in data:
+        db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
+                                           specie=row['sightings']['specie'], total_count=row['total_count'])
+    checklist_table_data = db(db.checklist_data).select().as_list()
+    return dict(data=checklist_table_data)
+
+@action('inc_count', method='POST') 
+@action.uses(db, session, auth.user)
+def inc_count(): 
+    # Get the count and id from the request
+    count = request.json.get('count')
+    id = request.json.get('id')
+    specie=request.json.get('specie')
+    
+    # Add observation to sightings table
+    # Figure out how to do SEI for new sightings
+    db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
+    # sighting_id = db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
+    # print("sightings entry: ", db(db.sightings.id == sighting_id).select().first())      
+    
+    # Update data for checklist table displayed on server side
+    specie = db(db.checklist_data.id == id).select().first()
+    specie.total_count += count; 
+    specie.update_record()
+    return dict(total=specie.total_count)
+
+@action('search')
+@action.uses(db, session, auth.user)
+def search(): 
+    q = request.params.get('q')
+    results = db(db.checklist_data.specie.like(f"%{q}%")).select(db.checklist_data.specie,
+                                db.checklist_data.total_count, 
+                                groupby=db.checklist_data.specie).as_list()
+    return dict(results=results)
+# ----------------------------------------------------------------------------- #
+
+
     
 
 
