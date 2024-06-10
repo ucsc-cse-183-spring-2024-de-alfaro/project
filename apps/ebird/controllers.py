@@ -57,12 +57,6 @@ def my_callback():
 def location():
     return dict(my_value=3)
 
-
-@action('location',  method=['GET', 'POST'])
-@action.uses('location.html', db, auth, url_signer)
-def location():
-    return dict(my_value=3)
-
 @action('get_heatmap_data')
 @action.uses(db, auth)
 def get_heatmap_data_action():
