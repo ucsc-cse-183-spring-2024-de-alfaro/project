@@ -99,7 +99,7 @@ def inc_count():
     db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
     # sighting_id = db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
     # print("sightings entry: ", db(db.sightings.id == sighting_id).select().first())      
-              
+    
     # Update data for checklist table displayed on server side
     specie = db(db.checklist_data.id == id).select().first()
     specie.total_count += count; 

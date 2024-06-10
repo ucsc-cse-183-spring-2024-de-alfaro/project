@@ -16,9 +16,12 @@ app.data = {
         }    
     },
     methods: {
+        //------ Helper functions -------------------------------------------------/
         find_specie_index: function(id) {
             return this.checklists.findIndex(specie => specie.id === id);
         },
+        
+        //------ Event Handling ---------------------------------------------------/
         search: function () {
             let self = this; 
             if (self.search_query.length > 0) {

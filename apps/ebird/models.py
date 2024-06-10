@@ -110,7 +110,7 @@ db.define_table('checklists',
     Field('time'),          # TIME - time observations started
     Field('observer_id'),   # OBSERVER_ID - observer ID, from checklist.csv
     Field('duration'),      # DURATION - duration of minutes of observations
-    Field('user_id'),        # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
+    Field('user_id'),       # USER_ID - ID of user account, user needs to be logged in to enter a checklist and access personal checklist page
     Field('user_email')     # USER_EMAIL - email of user account, user needs to be logged in to enter a checklist and access personal checklist page
 )
 prime_checklists()
