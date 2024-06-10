@@ -29,13 +29,9 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-<<<<<<< Updated upstream:controllers.py
-from .models import get_user_email
-=======
 from .models import get_user_email, get_heatmap_data
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
->>>>>>> Stashed changes:apps/ebird/controllers.py
 
 url_signer = URLSigner(session)
 
@@ -52,8 +48,6 @@ def index():
 def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
-<<<<<<< Updated upstream:controllers.py
-=======
 
 
 @action('location',  method=['GET', 'POST'])
@@ -150,11 +144,6 @@ def get_top_contributors():
         logger.error(f"Error fetching top contributors: {str(e)}")
         return dict(error=str(e))
 
-
-
-
-
-    
 # -------------------------- STATISTICS PAGE FUNCTIONS -------------------------- #
 @action('stats', method=['POST', 'GET'])
 @action('stats/<path:path>', method=['POST', 'GET'])
@@ -168,5 +157,3 @@ def stats(path=None):
         orderby=[db.sightings.specie],
         search_queries=[['Search by Name', lambda val: db.sightings.specie.contains(val)]])
     return dict(grid=grid)
-
->>>>>>> Stashed changes:apps/ebird/controllers.py
