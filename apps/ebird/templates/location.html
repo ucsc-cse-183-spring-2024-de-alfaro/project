@@ -1,0 +1,192 @@
+[[extend "layout.html"]]
+
+<div class="section" id="list_species" v-cloak>
+    <h1 class="title">Location</h1>
+
+    <!-- Species List -->
+    <div class="box" id="list_species_container">
+        <h2 class="subtitle">A list of species seen in the region</h2>
+        <!-- Add table-container div -->
+        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Species</th>
+                        <th>Sightings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Use v-for to create a row for each species -->
+                    <tr v-for="species in speciesList" :key="species.specie">
+                        <td>{{ species.specie }}</td>
+                        <td>{{ species.sightings }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Display a message when the list is empty -->
+        <p v-if="speciesList.length === 0">Loading species data...</p>
+    </div>
+</div>
+
+<div class="section" id="over_time" v-cloak>
+    <h1 class="title">Species Seen Over Time</h1>
+    <canvas id="over_time_chart"></canvas>
+</div>
+
+<div class="section" id="top_contributors" v-cloak>
+    <h1 class="title">Top Contributors</h1>
+    <div class="box" id="top_contributors_container">
+        <h2 class="subtitle">Contributors with the most sightings</h2>
+        <!-- Add table-container div -->
+        <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Contributor</th>
+                        <th>Number of Sightings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="contributor in topContributors" :key="contributor.observer_id">
+                        <td>{{ contributor.observer_id }}</td>
+                        <td>{{ contributor.sighting_count }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p v-if="topContributors.length === 0">Loading top contributors...</p>
+    </div>
+</div>
+
+[[block page_scripts]]
+<!-- Include Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Include Luxon for date handling -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+
+<!-- Include axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- Include Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    new Vue({
+        el: '#top_contributors_container',
+        data: {
+            topContributors: [] // Ensure topContributors is initialized as an empty array
+        },
+        mounted() {
+            axios.post('/ebird/api/get_top_contributors')
+                .then(response => {
+                    this.topContributors = response.data.topContributors;
+                })
+                .catch(error => {
+                    console.error("Error fetching top contributors:", error);
+                });
+        }
+    });
+
+    new Vue({
+        el: '#list_species_container',
+        data: {
+            speciesList: [], // Initialize an empty array to hold species data
+            selectedRegion: '',
+            regions: ['Region A', 'Region B', 'Region C'] // Add your list of regions here
+        },
+        mounted() {
+            this.fetchSpeciesList();
+        },
+        methods: {
+            fetchSpeciesList() {
+                axios.post('/ebird/api/get_species_list', { region: this.selectedRegion })
+                    .then(response => {
+                        this.speciesList = response.data.speciesList;
+                    })
+                    .catch(error => {
+                        console.error("Error fetching species list:", error);
+                    });
+            }
+        }
+    });
+
+    new Vue({
+        el: '#over_time',
+        data: {
+            sightings: []
+        },
+        mounted() {
+            axios.post('/ebird/api/get_sightings', { species: 'American Crow'}) 
+                .then(response => {
+                    this.sightings = response.data.sightings;
+                    this.renderChart();
+                })
+                .catch(error => {
+                    console.error("There was an error:", error);
+                });
+        },
+        methods: {
+            renderChart() {
+                const ctx = document.getElementById('over_time_chart').getContext('2d');
+
+                const data = this.sightings.map(d => {
+                    try {
+                        // If date or count is missing, return null to handle gracefully later
+                        if (!d.date || isNaN(d.count)) return null;
+
+                        return {
+                            x: new Date(`${d.date} ${d.time}`), // Combine date and time into a single JavaScript Date object
+                            y: +d.count // Convert count to number
+                        };
+                    } catch (error) {
+                        console.error("Error parsing date:", error);
+                        return null;
+                    }
+                }).filter(point => point !== null); // Filter out null points
+
+                const chart = new Chart(ctx, {
+                    type: 'bubble', // Keep chart type as 'bubble'
+                    data: {
+                        datasets: [{
+                            label: 'Species Seen Over Time',
+                            data: data,
+                            backgroundColor: 'steelblue', // Set the color for bubble points
+                            borderColor: 'transparent', // Set border color as transparent
+                            borderWidth: 0, // Set border width to 0
+                            hoverRadius: 5, // Set hover radius for better interactivity
+                            radius: 3 // Set radius for bubble points
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day', // Display ticks by day
+                                    tooltipFormat: 'MMM D, YYYY h:mm A', // Format for tooltips
+                                    displayFormats: {
+                                        hour: 'MMM D, YYYY h:mm A', // Format for displaying hours and minutes in 12-hour format with AM/PM
+                                        day: 'MMM D, YYYY' // Format for displaying days
+                                    }
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+[[end]]
