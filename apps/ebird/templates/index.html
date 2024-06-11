@@ -65,6 +65,7 @@ new Vue({
   },
   mounted() {
     this.initMap();
+    this.map.on('click', this.onMapClick);  //added for redirecting to location on click
   },
   methods: {
     initMap() {
@@ -138,6 +139,15 @@ new Vue({
     updateSpecies(event) {
       this.selectedSpecies = event.target.value;
       this.updateMap();
+    },
+    onMapClick(event) {
+      // Capture latitude and longitude of the clicked point
+      const lat = event.latlng.lat;
+      const lng = event.latlng.lng;
+
+      // Redirect to the location page with coordinates as parameters
+      window.location.href = `[[=URL('location')]]?lat=${lat}&lng=${lng}`;
+
     },
     getStatisticsOnRegion() {
       if (this.drawnItems.getLayers().length > 0) {
