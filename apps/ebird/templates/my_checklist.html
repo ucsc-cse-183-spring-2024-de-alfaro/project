@@ -36,6 +36,9 @@
           </p>
         </div>
       </div>
+      <div class="level-right">
+        <a href="[[=URL('checklist')]]" class="button is-medium is-info">Go to Main Checklist</a>
+      </div>
   </div>
   <!-- TABLE OF USER'S CHECKLISTS -->
   <div class="section"> 
@@ -54,11 +57,10 @@
             <td>
               <div class="columns">
                 <div class="column has-text-centered button-column">
-                   <!-- <button class="button is-small is-warning action-button" type="button">Edit</button> -->
-                   <a href="[[=URL('edit_checklist')]]" class="button is-small is-warning action-button">Edit</a>
+                   <a href="[[=URL('edit_checklist')]]" class="button is-small is-link action-button">Edit</a>
                 </div>
                 <div class="column has-text-centered button-column">
-                    <button class="button is-small is-danger action-button" type="button" @click="delete_checklist(checklist.id, checklist.specie, checklist.count)">Delete</button>
+                    <button class="button is-small is-danger is-light action-button" type="button" @click="delete_checklist(checklist.id, checklist.specie, checklist.count)">Delete</button>
                 </div>
               </div>
             </td>
