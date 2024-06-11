@@ -1,0 +1,60 @@
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+     display: none;
+}
+
+</style>
+
+<div class="section" id="app" v-cloak>
+    <!-- PAGE HEADER -->
+  <div class="hero margin-bottom is-info is-small"> 
+    <div class="hero-body">
+      <div class="container is-info">
+        <h1 class="title">My Checklists</h1>
+        <h3 class="subtitle">Welcome to your personal birdwatching journey! Here, you can view and manage your checklist of bird sightings. Happy birding!</h3>
+      </div>
+    </div>
+  </div>
+  <!-- TABLE OF USER'S CHECKLISTS -->
+  <div class="section"> 
+    <table class="table is-fullwidth is-striped is-hoverable"> 
+      <thead>
+        <tr>
+          <th>Specie</th>
+          <th>Count</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody> 
+          <tr v-for="checklist in table_data" :key="checklist.id">
+            <td>{{ checklist.specie }}</td>
+            <td>{{ checklist.count }}</td>
+            <td>
+              <div class="columns">
+                <div class="column">
+                    <input class="input is-size-7" type="number" min="0" value="0" v-model="checklist.input" placeholder="Enter Bird Count">
+                </div>
+                <div class="column">
+                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id, checklist.specie)">Save Checklist</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+[[block page_scripts]]
+<script>
+    let checklist_url = "[[=XML(checklist_url)]]";
+    let my_checklist_url = "[[=XML(my_checklist_url)]]";
+    let load_checklists_url = "[[=XML(load_checklists_url)]]";
+    let load_user_checklists_url = "[[=XML(load_user_checklists_url)]]";
+</script>
+<script src="js/my_checklist.js"></script>
+[[end]]
+

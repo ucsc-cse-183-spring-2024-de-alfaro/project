@@ -47,6 +47,7 @@ def index():
         my_callback_url = URL('my_callback', signer=url_signer),
         get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
         checklist_url = URL('checklist', signer=url_signer),
+        location_url = URL('location', signer=url_signer)
     )
 
 @action('my_callback')
@@ -73,25 +74,37 @@ def get_heatmap_data_action():
         return dict(error=str(e))
     
 
-# -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
+# -------------------------- CHECKLIST and MY_CHECKLIST PAGE FUNCTIONS -------------------------- #
 @action('checklist', method=['POST', 'GET'])
 @action.uses('checklist.html', session, db, auth.user, url_signer)
 def checklist(): 
     return dict(
             checklist_url = URL('checklist', signer=url_signer),
+            my_checklist_url = URL('my_checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             search_species_url = URL('search'),
             inc_count_url = URL('inc_count')
             )
 
+@action('my_checklist', method=['POST', 'GET'])
+@action.uses('my_checklist.html', session, db, auth.user, url_signer)
+def my_checklist(): 
+    return dict(
+            my_checklist_url = URL('my_checklist', signer=url_signer),
+            checklist_url = URL('checklist', signer=url_signer),
+            load_checklists_url = URL('load_checklists'),
+            load_user_checklists_url = URL('load_user_checklists'),
+            )   
+
+@action('load_user_checklists')
+@action.uses(db, session, auth.user)
+def load_user_checklists():
+    user_checklists = db(db.sightings.user_email == get_user_email()).select().as_list()
+    return dict(data=user_checklists)
+                
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 
-    data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
-                                groupby=db.sightings.specie).as_list()
-    for row in data:
-        db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
-                                           specie=row['sightings']['specie'], total_count=row['total_count'])
     checklist_table_data = db(db.checklist_data).select().as_list()
     return dict(data=checklist_table_data)
 

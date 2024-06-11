@@ -21,9 +21,6 @@
       <a href="[[=URL('stats')]]" class="card-footer-item">My Birding</a>
     </footer>
   </div>
-  <div>
-    <!-- <a >Submit a Checklist</a> -->
-  </div>
   
   <div id="map"></div>
   
@@ -34,8 +31,6 @@
       <!-- Add more species options here -->
     </select>
   </div>
-  
-  <button @click="getStatisticsOnRegion">Statistics on Region</button>
 </div>
 
 [[block page_scripts]]
@@ -43,6 +38,7 @@
   let my_callback_url = "[[=XML(my_callback_url)]]";
   let get_heatmap_data_url = "[[=XML(get_heatmap_data_url)]]";  // Use the signed URL in the frontend
   let checklist_url ="[[=XML(checklist_url)]]";
+  let location_url = "[[=XML(location_url)]]";
 
   // console.log("my_callback_url:", my_callback_url);  // Log for debugging
   // console.log("get_heatmap_data_url:", get_heatmap_data_url);  // Log for debugging
@@ -81,21 +77,8 @@ new Vue({
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19
           }).addTo(this.map);
+        
 
-          this.drawnItems = new L.FeatureGroup();
-          this.map.addLayer(this.drawnItems);
-
-          const drawControl = new L.Control.Draw({
-            edit: {
-              featureGroup: this.drawnItems
-            }
-          });
-          this.map.addControl(drawControl);
-
-          this.map.on(L.Draw.Event.CREATED, (event) => {
-            const layer = event.layer;
-            this.drawnItems.addLayer(layer);
-          });
 
           // Initialize map with bird sightings
           this.updateMap();
@@ -141,22 +124,21 @@ new Vue({
       this.updateMap();
     },
     onMapClick(event) {
-      // Capture latitude and longitude of the clicked point
-      const lat = event.latlng.lat;
-      const lng = event.latlng.lng;
+    const { lat, lng } = event.latlng;
 
-      // Redirect to the location page with coordinates as parameters
-      window.location.href = `[[=URL('location')]]?lat=${lat}&lng=${lng}`;
+    // Define the popup content HTML string with an anchor tag
+    const popupContent = `
+        <div>
+            <a class="button" href="[[=XML(checklist_url)]]?lat=${lat}&lng=${lng}"?lat=${lat}&lng=${lng}" target="_blank">Submit a Checklist</a><br>
+            <a class="button" href="[[=XML(location_url)]]?lat=${lat}&lng=${lng}" target="_blank">View Region Statistics</a>
+        </div>
+    `;
 
-    },
-    getStatisticsOnRegion() {
-      if (this.drawnItems.getLayers().length > 0) {
-        const bounds = this.drawnItems.getBounds();
-        // Redirect to statistics page with bounds
-        window.location.href = `stats.html?bounds=${bounds.toBBoxString()}&species=${this.selectedSpecies}`;
-      } else {
-        alert('Please draw a rectangle to select a region.');
-      }
+    // Create and open the popup
+    const popup = L.popup()
+        .setLatLng([lat, lng])
+        .setContent(popupContent)
+        .openOn(this.map);
     }
   }
 });
