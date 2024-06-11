@@ -34,6 +34,7 @@ from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 
 import json  #added for debugging
+import math #for lat and lng calculations
 from pydal.validators import IS_NOT_EMPTY #added for location query
 
 url_signer = URLSigner(session)
@@ -124,7 +125,7 @@ def search():
     return dict(results=results)
 # ----------------------------------------------------------------------------- #
 
-# -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
+# -------------------------- LOCATION PAGE FUNCTIONS -------------------------- #
 # Define lat and lng as global variables
 lat = None
 lng = None
@@ -155,9 +156,9 @@ def get_sightings():
     if lat is None or lng is None:
         return dict(error="Latitude and longitude are not set.")
 
-    # Define the range for latitude and longitude within approximately 1 degree (around 70 miles)
-    lat_range = 1.0
-    lng_range = 1.0
+    # Define the range for latitude and longitude
+    lat_range = 10 / 69.0  # Approximately 10 miles in latitude (1 degree of latitude is about 69 miles)
+    lng_range = 10 / (69.0 * math.cos(math.radians(lat)))  # Approximately 10 miles in longitude
 
     # Calculate the latitude and longitude boundaries
     min_lat = lat - lat_range
@@ -170,10 +171,10 @@ def get_sightings():
 
     # Fetch sightings within the defined range
     sightings_query = db(
-        (db.checklists.latitude >= min_lat) &
-        (db.checklists.latitude <= max_lat) &
-        (db.checklists.longitude >= min_lng) &
-        (db.checklists.longitude <= max_lng)
+        (db.checklists.latitude.cast('float') >= min_lat) &
+        (db.checklists.latitude.cast('float') <= max_lat) &
+        (db.checklists.longitude.cast('float') >= min_lng) &
+        (db.checklists.longitude.cast('float') <= max_lng)
     ).select(
         db.sightings.ALL,
         db.checklists.ALL,
@@ -195,7 +196,7 @@ def get_sightings():
         }
         sightings.append(sighting_data)
 
-    print(f"Found sightingsss: {sightings}")
+    #print(f"Found sightingsss: {sightings}")
     return dict(sightings=sightings)
 
 
@@ -204,23 +205,60 @@ def get_sightings():
 @action.uses(db)
 def get_species_list():
     try:
-        # Fetch distinct species from the sightings table based on the selected region
-        region = request.json.get('region')  # Assuming the region is sent in the request JSON
-        if region:
-            sightings_query = db((db.sightings.region == region)).select(db.sightings.specie, distinct=True)
-        else:
-            sightings_query = db().select(db.sightings.specie, distinct=True)
-        
+        global lat, lng  # Access the global variables
+
+        # Ensure latitude and longitude are set
+        if lat is None or lng is None:
+            return dict(error="Latitude and longitude are not set.")
+
+        # Define the range for latitude and longitude
+        lat_range = 10 / 69.0  # Approximately 10 miles in latitude (1 degree of latitude is about 69 miles)
+        lng_range = 10 / (69.0 * math.cos(math.radians(lat)))  # Approximately 10 miles in longitude
+
+        # Calculate the latitude and longitude boundaries
+        min_lat = lat - lat_range
+        max_lat = lat + lat_range
+        min_lng = lng - lng_range
+        max_lng = lng + lng_range
+
+        # Fetch sightings within the defined range
+        sightings_query = db(
+            (db.checklists.latitude.cast('float') >= min_lat) &
+            (db.checklists.latitude.cast('float') <= max_lat) &
+            (db.checklists.longitude.cast('float') >= min_lng) &
+            (db.checklists.longitude.cast('float') <= max_lng)
+        ).select(
+            db.sightings.ALL,
+            db.checklists.ALL,
+            join=db.sightings.on(db.sightings.sei == db.checklists.sei),
+        )
+
+        # Convert the query results to a list of dictionaries
         species_list = sightings_query.as_list()
 
-        # Count the number of sightings for each species
-        for species in species_list:
-            species['sightings'] = db(db.sightings.specie == species['specie']).count()
+        # Create a dictionary to count the number of sightings for each species
+        sightings_count = {}
+        for sighting in species_list:
+            # Extract specie field. Adjust field access according to actual structure.
+            specie = sighting.get('sightings', {}).get('specie')
+            if specie:
+                if specie in sightings_count:
+                    sightings_count[specie] += 1
+                else:
+                    sightings_count[specie] = 1
 
-        return dict(speciesList=species_list)
+        # Create the final list with species and their sightings count
+        final_species_list = []
+        for specie, count in sightings_count.items():
+            final_species_list.append({'specie': specie, 'sightings': count})
+
+        return dict(speciesList=final_species_list)
     except Exception as e:
         logger.error(f"Error fetching species list: {str(e)}")
         return dict(error=str(e))
+
+
+
 
 
 @action('api/get_top_contributors', method=['GET', 'POST'])

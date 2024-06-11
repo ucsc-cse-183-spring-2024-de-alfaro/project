@@ -139,18 +139,19 @@
 
                 const data = this.sightings.map(d => {
                     try {
-                        // If date or count is missing, return null to handle gracefully later
                         if (!d.date || isNaN(d.count)) return null;
 
                         return {
-                            x: new Date(`${d.date} ${d.time}`), // Combine date and time into a single JavaScript Date object
-                            y: +d.count // Convert count to number
+                            x: new Date(`${d.date} ${d.time}`),
+                            y: +d.count,
+                            label: d.specie // Add the species name as the label
                         };
                     } catch (error) {
                         console.error("Error parsing date:", error);
                         return null;
                     }
-                }).filter(point => point !== null); // Filter out null points
+                }).filter(point => point !== null);
+
 
                 const chart = new Chart(ctx, {
                     type: 'bubble', // Keep chart type as 'bubble'
@@ -170,16 +171,25 @@
                             x: {
                                 type: 'time',
                                 time: {
-                                    unit: 'day', // Display ticks by day
-                                    tooltipFormat: 'MMM D, YYYY h:mm A', // Format for tooltips
+                                    unit: 'day',
                                     displayFormats: {
-                                        hour: 'MMM D, YYYY h:mm A', // Format for displaying hours and minutes in 12-hour format with AM/PM
-                                        day: 'MMM D, YYYY' // Format for displaying days
+                                        day: 'MMM D, YYYY'
                                     }
                                 }
                             },
                             y: {
                                 beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const datasetLabel = context.dataset.label || '';
+                                        const label = context.dataset.data[context.dataIndex].label || '';
+                                        return `${datasetLabel}: ${label}`;
+                                    }
+                                }
                             }
                         }
                     }
