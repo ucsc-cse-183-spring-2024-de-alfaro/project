@@ -46,6 +46,7 @@ def index():
         my_callback_url = URL('my_callback', signer=url_signer),
         get_heatmap_data_url = URL('get_heatmap_data', signer=url_signer),  # Add this line
         checklist_url = URL('checklist', signer=url_signer),
+        location_url = URL('location', signer=url_signer)
     )
 
 @action('my_callback')
