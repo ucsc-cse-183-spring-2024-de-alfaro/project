@@ -89,6 +89,16 @@ def prime_sightings():
                     favorite=False,  # Default value
                     user_email=None
                 )
+
+# Prime the checklist_data database s
+# Aggregates data from sightings database, grouping by species and getting the total count per specie
+def prime_checklist_data():
+    data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
+                                groupby=db.sightings.specie).as_list()
+    for row in data:
+        db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
+                                           specie=row['sightings']['specie'], total_count=row['total_count'])
+
 # -------------------------- DATABASES -------------------------- #
 
 ### SPECIES DATABASE ###
@@ -129,6 +139,7 @@ db.define_table('checklist_data',
     Field('total_count', 'integer'),
     Field('input', 'integer', default=0)
 )
+prime_checklist_data()
 
 ## always commit your models to avoid problems later
 db.commit()
