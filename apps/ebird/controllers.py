@@ -33,6 +33,9 @@ from .models import get_user_email, get_heatmap_data
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 
+import json  #added for debugging
+from pydal.validators import IS_NOT_EMPTY #added for location query
+
 url_signer = URLSigner(session)
 
 @action('index')
@@ -52,11 +55,6 @@ def my_callback():
     return dict(my_value=3)
 
 # -------------------------- LOCATION PAGE FUNCTIONS -------------------------- #
-
-@action('location',  method=['GET', 'POST'])
-@action.uses('location.html', db, auth, url_signer)
-def location():
-    return dict(my_value=3)
 
 @action('get_heatmap_data')
 @action.uses(db, auth)
@@ -126,56 +124,104 @@ def search():
     return dict(results=results)
 # ----------------------------------------------------------------------------- #
 
+# -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
+# Define lat and lng as global variables
+lat = None
+lng = None
 
+@action('location')
+@action.uses('location.html', session, db, auth.user, url_signer)
+def location():
+    global lat, lng 
+    # Get latitude and longitude from the request parameters
+    lat = request.params.get('lat')
+    lng = request.params.get('lng')
     
+    # Convert latitude and longitude from strings to float values if needed
+    lat = float(lat) if lat is not None else None
+    lng = float(lng) if lng is not None else None
+    
+    #print('lat', lat)
+    #print('lng', lng)
+    # Now you can use lat and lng variables in your page logic
+    return dict(latitude=lat, longitude=lng)
 
-
-#Location Page 
 @action('api/get_sightings', method=['GET', 'POST'])
 @action.uses(db)
 def get_sightings():
-    species = request.params.get('species', 'American Robin')
-    sightings = db(db.sightings.specie == species).select().as_list()
-    
-    # Debugging: print the species and sightings fetched
-    #print(f"Species: {species}")
-    #print("Sightings:", sightings)
+    global lat, lng  # Access the global variables
 
-    for sighting in sightings:
-        sei_value = sighting['sei']
-        checklist = db(db.checklists.sei == sei_value).select().first()
+    # Ensure latitude and longitude are set
+    if lat is None or lng is None:
+        return dict(error="Latitude and longitude are not set.")
 
-        # Debugging: check if the checklist is found and print its content
-        if checklist:
-            #print(f"Found checklist for SEI {sei_value}: {checklist}")
-            sighting['date'] = checklist.date
-        else:
-            #print(f"No checklist found for SEI {sei_value}")
-            sighting['date'] = None
+    # Define the range for latitude and longitude within approximately 1 degree (around 70 miles)
+    lat_range = 1.0
+    lng_range = 1.0
 
-    # Remove entries without a valid date
-    sightings = [s for s in sightings if s['date']]
-    #print("Processed sightings with dates:", sightings)
+    # Calculate the latitude and longitude boundaries
+    min_lat = lat - lat_range
+    max_lat = lat + lat_range
+    min_lng = lng - lng_range
+    max_lng = lng + lng_range
 
+    print(f"Latitude range: {min_lat} to {max_lat}")
+    print(f"Longitude range: {min_lng} to {max_lng}")
+
+    # Fetch sightings within the defined range
+    sightings_query = db(
+        (db.checklists.latitude >= min_lat) &
+        (db.checklists.latitude <= max_lat) &
+        (db.checklists.longitude >= min_lng) &
+        (db.checklists.longitude <= max_lng)
+    ).select(
+        db.sightings.ALL,
+        db.checklists.ALL,
+        join=db.sightings.on(db.sightings.sei == db.checklists.sei),
+        orderby=db.checklists.date
+    )
+
+    sightings = []
+    for sighting in sightings_query:
+        sighting_data = {
+            'specie': sighting.sightings.specie,
+            'count': sighting.sightings.count,
+            'date': sighting.checklists.date,
+            'latitude': sighting.checklists.latitude,
+            'longitude': sighting.checklists.longitude,
+            'sei': sighting.checklists.sei,
+            'observer_id': sighting.checklists.observer_id,
+            'time': sighting.checklists.time
+        }
+        sightings.append(sighting_data)
+
+    print(f"Found sightingsss: {sightings}")
     return dict(sightings=sightings)
+
+
 
 @action('api/get_species_list', method=['GET', 'POST'])
 @action.uses(db)
 def get_species_list():
     try:
-        # Fetch distinct species from the sightings table
-        species_list = db(db.sightings).select(db.sightings.specie, distinct=True).as_list()
+        # Fetch distinct species from the sightings table based on the selected region
+        region = request.json.get('region')  # Assuming the region is sent in the request JSON
+        if region:
+            sightings_query = db((db.sightings.region == region)).select(db.sightings.specie, distinct=True)
+        else:
+            sightings_query = db().select(db.sightings.specie, distinct=True)
         
+        species_list = sightings_query.as_list()
+
         # Count the number of sightings for each species
         for species in species_list:
             species['sightings'] = db(db.sightings.specie == species['specie']).count()
-            
-        #print(species_list)
+
         return dict(speciesList=species_list)
     except Exception as e:
         logger.error(f"Error fetching species list: {str(e)}")
         return dict(error=str(e))
-    
+
 
 @action('api/get_top_contributors', method=['GET', 'POST'])
 @action.uses(db)
