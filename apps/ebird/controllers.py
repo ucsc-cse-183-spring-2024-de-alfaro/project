@@ -80,11 +80,20 @@ def get_heatmap_data_action():
 def checklist(): 
     return dict(
             checklist_url = URL('checklist', signer=url_signer),
+            my_checklist_url = URL('my_checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             search_species_url = URL('search'),
             inc_count_url = URL('inc_count')
             )
 
+@action('my_checklist', method=['POST', 'GET'])
+@action.uses('my_checklist.html', session, db, auth.user, url_signer)
+def my_checklist(): 
+
+    return dict(
+            my_checklist_url = URL('my_checklist', signer=url_signer)
+            )   
+        
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 

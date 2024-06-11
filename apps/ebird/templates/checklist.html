@@ -12,7 +12,7 @@
   <div class="hero margin-bottom is-info is-small"> 
     <div class="hero-body">
       <div class="container is-info">
-        <h1 class="title">Bird Checklist</h1>
+        <h1 class="title">Bird Checklists</h1>
         <h3 class="subtitle">Explore the vast world of bird species! Log your sightings of our feathery friends in our comprehensive checklist library</h3>
       </div>
     </div>
@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="level-right">
-        <a href="[[=URL('index')]]" class="button is-medium is-info">My Checklist</a>
+        <a href="[[=URL('my_checklist')]]" class="button is-medium is-info">My Checklists</a>
       </div>
     </div>
   </div>
@@ -70,6 +70,7 @@
 <!-- Loads the index-specific js for Vue -->
 <script>
     let checklist_url = "[[=XML(checklist_url)]]";
+    let my_checklist_url = "[[=XML(my_checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
     let search_species_url = "[[=XML(search_species_url)]]";
     let inc_count_url = "[[=XML(inc_count_url)]]";
