@@ -29,7 +29,7 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email, get_heatmap_data
+from .models import get_user_email, get_heatmap_data, prime_checklist_data
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 
@@ -94,6 +94,7 @@ def my_checklist():
             load_checklists_url = URL('load_checklists'),
             load_user_checklists_url = URL('load_user_checklists'),
             delete_checklist_url = URL('delete_checklist'),
+            search_my_species_url = URL('my_search'),
             )   
 
 @action('load_user_checklists')
@@ -140,17 +141,55 @@ def search():
                                 groupby=db.checklist_data.specie).as_list()
     return dict(results=results)
 
+@action('my_search')
+@action.uses(db, session, auth.user)
+def my_search(): 
+    q = request.params.get('q')
+    results = db((db.sightings.specie.like(f"%{q}%")) & (db.sightings.user_email == get_user_email())).select(db.sightings.specie,
+                                db.sightings.count).as_list()
+    print("rseults", results)
+    return dict(results=results)
+
 @action('delete_checklist', method='POST')
 @action.uses(db, session, auth.user)
 def delete_checklist():
     id = request.json.get('id')
-    
+    specie = request.json.get('specie')
+    count = int(request.json.get('count'))
+
     # Delete data row from "sightings" table
     db(db.sightings.user_email == get_user_email() and db.sightings.id == id).delete()
     data = db(db.sightings.user_email == get_user_email()).select().as_list()
+
     # Delete data row from "checklist" table
 
+    bird = db(db.checklist_data.specie == specie).select().first()
+    new_count = bird.total_count - count
+    bird.total_count = new_count
+    bird.update_record()
+    # if row is not None:
+    #     new_count = 
+    #     new_count -= count 
+    #     print("new count: ", new_count)
+    #     print("row.total_count: ", row.total_count) 
+    #     # Edit total count for species in "checklist_data" table
+    #     db(db.checklist_data.specie == specie).update(total_count=new_count)
+
     return dict(user_checklists=data)
+
+# @action('update_image', method='POST')
+# @action.uses(db, session, auth.user) 
+# def update_image(): 
+#     file_name = request.json.get('file_name')
+#     file_type = request.json.get('file_type')
+#     image_url = request.json.get('image_url')
+#     record = db(db.contact_card.user_email == get_user_email() and db.contact_card.id == id).select().first()
+#     record.contact_image = image_url
+#     record.image_type = file_type
+#     record.image_name = file_name
+#     record.update_record()
+#     return "ok"
+
 
 # -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
 # Define lat and lng as global variables
