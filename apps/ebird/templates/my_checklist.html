@@ -43,7 +43,7 @@
                    <button class="button is-small is-warning action-button" type="button">Edit</button>
                 </div>
                 <div class="column has-text-centered button-column">
-                    <button class="button is-small is-danger action-button" type="button" @click="delete_checklist(checklist.specie)">Delete</button>
+                    <button class="button is-small is-danger action-button" type="button" @click="delete_checklist(checklist.id)">Delete</button>
                 </div>
               </div>
             </td>
@@ -60,6 +60,7 @@
     let my_checklist_url = "[[=XML(my_checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
     let load_user_checklists_url = "[[=XML(load_user_checklists_url)]]";
+    let delete_checklist_url = "[[=XML(delete_checklist_url)]]";
 </script>
 <script src="js/my_checklist.js"></script>
 [[end]]

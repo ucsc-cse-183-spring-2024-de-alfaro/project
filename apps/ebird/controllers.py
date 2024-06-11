@@ -81,7 +81,8 @@ def checklist():
             my_checklist_url = URL('my_checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             search_species_url = URL('search'),
-            inc_count_url = URL('inc_count')
+            inc_count_url = URL('inc_count'),
+            
             )
 
 @action('my_checklist', method=['POST', 'GET'])
@@ -92,6 +93,7 @@ def my_checklist():
             checklist_url = URL('checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             load_user_checklists_url = URL('load_user_checklists'),
+            delete_checklist_url = URL('delete_checklist'),
             )   
 
 @action('load_user_checklists')
@@ -137,6 +139,18 @@ def search():
                                 db.checklist_data.total_count, 
                                 groupby=db.checklist_data.specie).as_list()
     return dict(results=results)
+
+@action('delete_checklist', method='POST')
+@action.uses(db, session, auth.user)
+def delete_checklist():
+    id = request.json.get('id')
+    
+    # Delete data row from "sightings" table
+    db(db.sightings.user_email == get_user_email() and db.sightings.id == id).delete()
+    data = db(db.sightings.user_email == get_user_email()).select().as_list()
+    # Delete data row from "checklist" table
+
+    return dict(user_checklists=data)
 
 # -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
 # Define lat and lng as global variables
