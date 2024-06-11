@@ -8,7 +8,7 @@
 </style>
 
 <div class="section" id="app" v-cloak>
-      <!-- PAGE HEADER -->
+    <!-- PAGE HEADER -->
   <div class="hero margin-bottom is-info is-small"> 
     <div class="hero-body">
       <div class="container is-info">
@@ -17,7 +17,35 @@
       </div>
     </div>
   </div>
-  
+  <!-- TABLE OF USER'S CHECKLISTS -->
+  <div class="section"> 
+    <table class="table is-fullwidth is-striped is-hoverable"> 
+      <thead>
+        <tr>
+          <th>Specie</th>
+          <th>Count</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody> 
+          <tr v-for="checklist in table_data" :key="checklist.id">
+            <td>{{ checklist.specie }}</td>
+            <td>{{ checklist.total_count }}</td>
+            <td>
+              <div class="columns">
+                <div class="column">
+                    <input class="input is-size-7" type="number" min="0" value="0" v-model="checklist.input" placeholder="Enter Bird Count">
+                </div>
+                <div class="column">
+                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id, checklist.specie)">Save Checklist</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+    </table>
+    </div>
+  </div>
 </div>
 
 [[block page_scripts]]
@@ -25,8 +53,6 @@
     let checklist_url = "[[=XML(checklist_url)]]";
     let my_checklist_url = "[[=XML(my_checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
-    let search_species_url = "[[=XML(search_species_url)]]";
-    let inc_count_url = "[[=XML(inc_count_url)]]";
 </script>
 <script src="js/my_checklist.js"></script>
 [[end]]
