@@ -93,6 +93,7 @@ def edit_checklist():
             checklist_url = URL('checklist', signer=url_signer),
             load_user_checklists_url = URL('load_user_checklists'),
             edit_checklist_url = URL('edit_checklist', signer=url_signer),
+            update_checklist_url = URL('update_checklist'),
             )
 
 @action('my_checklist', method=['POST', 'GET'])
@@ -132,11 +133,8 @@ def inc_count():
     db.checklists.insert(observer_id=get_user_email(), user_email=get_user_email())
     
     # Add observation to sightings table
-    # Figure out how to do SEI for new sightings
     db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
-    # sighting_id = db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
-    # print("sightings entry: ", db(db.sightings.id == sighting_id).select().first())      
-    
+
     # Update data for checklist table displayed on server side
     specie = db(db.checklist_data.id == id).select().first()
     specie.total_count += count; 
@@ -161,6 +159,12 @@ def my_search():
     print("rseults", results)
     return dict(results=results)
 
+@action('update_checklist', method='POST')
+@action.uses(db, session, auth.user)
+def update_checklist(): 
+
+    return dict()
+
 @action('delete_checklist', method='POST')
 @action.uses(db, session, auth.user)
 def delete_checklist():
@@ -172,19 +176,11 @@ def delete_checklist():
     db(db.sightings.user_email == get_user_email() and db.sightings.id == id).delete()
     data = db(db.sightings.user_email == get_user_email()).select().as_list()
 
-    # Delete data row from "checklist" table
-
+    # Update total count in "checklist_data" table
     bird = db(db.checklist_data.specie == specie).select().first()
     new_count = bird.total_count - count
     bird.total_count = new_count
     bird.update_record()
-    # if row is not None:
-    #     new_count = 
-    #     new_count -= count 
-    #     print("new count: ", new_count)
-    #     print("row.total_count: ", row.total_count) 
-    #     # Edit total count for species in "checklist_data" table
-    #     db(db.checklist_data.specie == specie).update(total_count=new_count)
 
     return dict(user_checklists=data)
 

@@ -5,11 +5,23 @@ let app = {};
 app.data = {    
     data: function() {
         return {
-            checklists: []
+            checklists: [],
+            num_birds: 0, 
         };
     },
     methods: {
-
+        save_sightings: function () {
+            if (num_birds > 0) {
+                axios.post(update_checklist_url, {
+                    num_birds: num_birds,
+                    
+                }).then(function (r) {
+                    alert("Checklist successfully saved!");
+                });
+            } else {
+                alert("Please enter a valid number");
+            }
+        }
     }
 };
 
