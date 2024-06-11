@@ -54,7 +54,8 @@
             <td>
               <div class="columns">
                 <div class="column has-text-centered button-column">
-                   <button class="button is-small is-warning action-button" type="button">Edit</button>
+                   <!-- <button class="button is-small is-warning action-button" type="button">Edit</button> -->
+                   <a href="[[=URL('edit_checklist')]]" class="button is-small is-warning action-button">Edit</a>
                 </div>
                 <div class="column has-text-centered button-column">
                     <button class="button is-small is-danger action-button" type="button" @click="delete_checklist(checklist.id, checklist.specie, checklist.count)">Delete</button>
@@ -76,6 +77,7 @@
     let load_user_checklists_url = "[[=XML(load_user_checklists_url)]]";
     let search_my_species_url = "[[=XML(search_my_species_url)]]";
     let delete_checklist_url = "[[=XML(delete_checklist_url)]]";
+    let edit_checklist_url = "[[=XML(edit_checklist_url)]]";
 </script>
 <script src="js/my_checklist.js"></script>
 [[end]]

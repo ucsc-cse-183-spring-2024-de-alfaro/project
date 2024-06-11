@@ -50,8 +50,10 @@ app.data = {
                         self.checklists[index].total_count = r.data.total;
                     }
                     console.log("local total: ", self.checklists[index].total_count)
-                   
                 });
+            }
+            else {
+                alert("Please enter a valid number");
             }
         }
     }

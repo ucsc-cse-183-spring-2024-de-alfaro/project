@@ -79,10 +79,20 @@ def checklist():
     return dict(
             checklist_url = URL('checklist', signer=url_signer),
             my_checklist_url = URL('my_checklist', signer=url_signer),
+            edit_checklist_url = URL('edit_checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             search_species_url = URL('search'),
-            inc_count_url = URL('inc_count'),
-            
+            inc_count_url = URL('inc_count')
+            )
+
+@action('edit_checklist', method=['POST', 'GET'])
+@action.uses('edit_checklist.html', db, session, auth.user, url_signer)
+def edit_checklist():
+    return dict(
+            my_checklist_url = URL('my_checklist', signer=url_signer),
+            checklist_url = URL('checklist', signer=url_signer),
+            load_user_checklists_url = URL('load_user_checklists'),
+            edit_checklist_url = URL('edit_checklist', signer=url_signer),
             )
 
 @action('my_checklist', method=['POST', 'GET'])
@@ -91,6 +101,7 @@ def my_checklist():
     return dict(
             my_checklist_url = URL('my_checklist', signer=url_signer),
             checklist_url = URL('checklist', signer=url_signer),
+            edit_checklist_url = URL('edit_checklist', signer=url_signer),
             load_checklists_url = URL('load_checklists'),
             load_user_checklists_url = URL('load_user_checklists'),
             delete_checklist_url = URL('delete_checklist'),
@@ -176,20 +187,6 @@ def delete_checklist():
     #     db(db.checklist_data.specie == specie).update(total_count=new_count)
 
     return dict(user_checklists=data)
-
-# @action('update_image', method='POST')
-# @action.uses(db, session, auth.user) 
-# def update_image(): 
-#     file_name = request.json.get('file_name')
-#     file_type = request.json.get('file_type')
-#     image_url = request.json.get('image_url')
-#     record = db(db.contact_card.user_email == get_user_email() and db.contact_card.id == id).select().first()
-#     record.contact_image = image_url
-#     record.image_type = file_type
-#     record.image_name = file_name
-#     record.update_record()
-#     return "ok"
-
 
 # -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
 # Define lat and lng as global variables
