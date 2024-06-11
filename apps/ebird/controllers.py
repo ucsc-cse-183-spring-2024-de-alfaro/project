@@ -114,6 +114,9 @@ def inc_count():
     id = request.json.get('id')
     specie=request.json.get('specie')
     
+    # Update data for checklist table
+    db.checklists.insert(observer_id=get_user_email(), user_email=get_user_email())
+    
     # Add observation to sightings table
     # Figure out how to do SEI for new sightings
     db.sightings.insert(specie=specie, count=count, user_email=get_user_email())
@@ -134,7 +137,6 @@ def search():
                                 db.checklist_data.total_count, 
                                 groupby=db.checklist_data.specie).as_list()
     return dict(results=results)
-# ----------------------------------------------------------------------------- #
 
 # -------------------------- CHECKLIST PAGE FUNCTIONS -------------------------- #
 # Define lat and lng as global variables

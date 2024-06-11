@@ -1,10 +1,16 @@
 [[extend 'layout.html']]
 
 <style>
-[v-cloak] {
-     display: none;
-}
-
+    [v-cloak] {
+        display: none;
+    }
+    .action-button {
+        width: 150px;  /* Adjust as needed */
+    }
+    .button-column {
+        display: flex;
+        justify-content: right;
+    }
 </style>
 
 <div class="section" id="app" v-cloak>
@@ -33,11 +39,11 @@
             <td>{{ checklist.count }}</td>
             <td>
               <div class="columns">
-                <div class="column">
-                    <input class="input is-size-7" type="number" min="0" value="0" v-model="checklist.input" placeholder="Enter Bird Count">
+                <div class="column has-text-centered button-column">
+                   <button class="button is-small is-warning action-button" type="button">Edit</button>
                 </div>
-                <div class="column">
-                    <button class="button is-small is-primary" type="button" @click="inc_count(checklist.input, checklist.id, checklist.specie)">Save Checklist</button>
+                <div class="column has-text-centered button-column">
+                    <button class="button is-small is-danger action-button" type="button" @click="delete_checklist(checklist.specie)">Delete</button>
                 </div>
               </div>
             </td>
