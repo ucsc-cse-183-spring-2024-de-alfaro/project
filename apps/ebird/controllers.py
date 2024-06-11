@@ -33,6 +33,7 @@ from .models import get_user_email, get_heatmap_data
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.grid import Grid, GridClassStyleBulma
 
+import urllib.parse #for parsing location url
 import json  #added for debugging
 import math #for lat and lng calculations
 from pydal.validators import IS_NOT_EMPTY #added for location query
@@ -56,7 +57,7 @@ def my_callback():
     # The return value should be a dictionary that will be sent as JSON.
     return dict(my_value=3)
 
-# -------------------------- LOCATION PAGE FUNCTIONS -------------------------- #
+# -------------------------- INDEX PAGE FUNCTIONS -------------------------- #
 
 @action('get_heatmap_data')
 @action.uses(db, auth)
@@ -148,17 +149,33 @@ lng = None
 def location():
     global lat, lng 
     # Get latitude and longitude from the request parameters
-    lat = request.params.get('lat')
-    lng = request.params.get('lng')
+    signature_param = request.params.get('_signature')
+    lat_param = None
+    lng_param = request.params.get('lng')
+
+    if signature_param:
+        # Decode the signature_param
+        try:
+            decoded_signature = urllib.parse.unquote(signature_param)
+            lat_index = decoded_signature.find('lat=') + len('lat=')
+            lat_end_index = decoded_signature.find('&', lat_index)
+            lat_param = decoded_signature[lat_index:lat_end_index]
+        except Exception as e:
+            print(f"Error decoding signature parameter: {e}")
+
+    print('lat_param:', lat_param)
+    print('lng_param:', lng_param)
     
     # Convert latitude and longitude from strings to float values if needed
-    lat = float(lat) if lat is not None else None
-    lng = float(lng) if lng is not None else None
+    lat = float(lat_param) if lat_param is not None else None
+    lng = float(lng_param) if lng_param is not None else None
     
-    #print('lat', lat)
-    #print('lng', lng)
+    print('lat:', lat)
+    print('lng:', lng)
+    
     # Now you can use lat and lng variables in your page logic
     return dict(latitude=lat, longitude=lng)
+
 
 @action('api/get_sightings', method=['GET', 'POST'])
 @action.uses(db)
@@ -211,7 +228,6 @@ def get_sightings():
 
     #print(f"Found sightingsss: {sightings}")
     return dict(sightings=sightings)
-
 
 
 @action('api/get_species_list', method=['GET', 'POST'])
@@ -269,10 +285,6 @@ def get_species_list():
     except Exception as e:
         logger.error(f"Error fetching species list: {str(e)}")
         return dict(error=str(e))
-
-
-
-
 
 @action('api/get_top_contributors', method=['GET', 'POST'])
 @action.uses(db)
