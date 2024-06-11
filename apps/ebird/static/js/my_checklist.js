@@ -39,7 +39,7 @@ app.data = {
 app.vue = Vue.createApp(app.data).mount("#app");
 
 app.load_data = function () {
-    axios.get(load_my_checklists_url).then(function (r) {
+    axios.get(load_user_checklists_url).then(function (r) {
         app.vue.checklists = r.data.data;
     });
 }

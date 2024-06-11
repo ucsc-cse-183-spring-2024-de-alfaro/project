@@ -92,24 +92,19 @@ def my_checklist():
     return dict(
             my_checklist_url = URL('my_checklist', signer=url_signer),
             checklist_url = URL('checklist', signer=url_signer),
-            load_checklists_url = URL('load_checklists')
+            load_checklists_url = URL('load_checklists'),
+            load_user_checklists_url = URL('load_user_checklists'),
             )   
 
 @action('load_user_checklists')
 @action.uses(db, session, auth.user)
 def load_user_checklists():
-    data = db(db.sightings.user_email == get_user_email()).select().as_list()
-    return dict(data=data)
+    user_checklists = db(db.sightings.user_email == get_user_email()).select().as_list()
+    return dict(data=user_checklists)
                 
 @action('load_checklists')
 @action.uses(db, session, auth.user)
 def load_checklists(): 
-    # data = db(db.sightings).select(db.sightings.specie, db.sightings.count.sum().with_alias('total_count'), 
-    #                             groupby=db.sightings.specie).as_list()
-    # for row in data:
-    #     db.checklist_data.update_or_insert((db.checklist_data.specie == row['sightings']['specie']),
-    #                                        specie=row['sightings']['specie'], total_count=row['total_count'])
-    # checklist_table_data = db(db.checklist_data).select().as_list()
     checklist_table_data = db(db.checklist_data).select().as_list()
     return dict(data=checklist_table_data)
 

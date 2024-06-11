@@ -30,7 +30,7 @@
         <tbody> 
           <tr v-for="checklist in table_data" :key="checklist.id">
             <td>{{ checklist.specie }}</td>
-            <td>{{ checklist.total_count }}</td>
+            <td>{{ checklist.count }}</td>
             <td>
               <div class="columns">
                 <div class="column">
@@ -53,6 +53,7 @@
     let checklist_url = "[[=XML(checklist_url)]]";
     let my_checklist_url = "[[=XML(my_checklist_url)]]";
     let load_checklists_url = "[[=XML(load_checklists_url)]]";
+    let load_user_checklists_url = "[[=XML(load_user_checklists_url)]]";
 </script>
 <script src="js/my_checklist.js"></script>
 [[end]]
